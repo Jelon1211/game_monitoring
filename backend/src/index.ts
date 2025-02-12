@@ -1,27 +1,27 @@
-import express, { Express } from "express";
-import { getAppDetails } from "./api-server/app-details/get-app-details";
-import { assignProcessEnvs } from "./api-server/app-details/assign-process-envs";
-import { Morgan } from "./loggers/morgan/morgan";
+import express, {Express} from "express";
+import {getAppDetails} from "./api-server/app-details/get-app-details";
+import {assignProcessEnvs} from "./api-server/app-details/assign-process-envs";
+import {Morgan} from "./loggers/morgan/morgan";
 import ConfigBuilder from "./config-builder/config-builder";
-import { Config } from "./config-builder/config.interface";
-import { AppLogger } from "./loggers/logger-service/logger.service";
-import { ErrorLog } from "./loggers/error-log/error-log.instance";
-import { InfoLog } from "./loggers/info-log/info-log.instance";
-import { LoggerLevelEnum } from "./loggers/log-level/logger-level.enum";
-import { ApplicationException } from "./exceptions/application.exception";
-import { ExceptionCodeEnum } from "./exceptions/exception-code.enum";
-import { SecurityHelpers } from "./api-server/security-helpers/security.helpers";
-import { Routes } from "./api-server/main-router/routes.enum";
-import { CheckRouter } from "./api-server/health-check/router/check.router";
-import { MainRouter } from "./api-server/main-router/main.router";
-import { NotFoundRouter } from "./api-server/exception-handling/not-found/not-found.router";
-import { AuthMiddleware } from "./api-server/auth/auth.middleware";
-import { HttpExceptionHandlerService } from "./api-server/exception-handling/http-exception-handler/http.exception-handler.service";
-import { CronJobsWrapperService } from "./cron/cron-jobs-wrapper.service";
-import { AppSentry } from "./loggers/sentry/sentry";
-import { MySqlDataSource } from "./data-sources/sql/sql-data-source";
-import { TrackerRouter } from "./api-server/tracker/router/tracker.router";
-import { TestJob } from "./cron/crone-jobs/test.job";
+import {Config} from "./config-builder/config.interface";
+import {AppLogger} from "./loggers/logger-service/logger.service";
+import {ErrorLog} from "./loggers/error-log/error-log.instance";
+import {InfoLog} from "./loggers/info-log/info-log.instance";
+import {LoggerLevelEnum} from "./loggers/log-level/logger-level.enum";
+import {ApplicationException} from "./exceptions/application.exception";
+import {ExceptionCodeEnum} from "./exceptions/exception-code.enum";
+import {SecurityHelpers} from "./api-server/security-helpers/security.helpers";
+import {Routes} from "./api-server/main-router/routes.enum";
+import {CheckRouter} from "./api-server/health-check/router/check.router";
+import {MainRouter} from "./api-server/main-router/main.router";
+import {NotFoundRouter} from "./api-server/exception-handling/not-found/not-found.router";
+import {AuthMiddleware} from "./api-server/auth/auth.middleware";
+import {HttpExceptionHandlerService} from "./api-server/exception-handling/http-exception-handler/http.exception-handler.service";
+import {CronJobsWrapperService} from "./cron/cron-jobs-wrapper.service";
+import {AppSentry} from "./loggers/sentry/sentry";
+import {MySqlDataSource} from "./data-sources/sql/sql-data-source";
+import {TrackerRouter} from "./api-server/tracker/router/tracker.router";
+import {TestJob} from "./cron/crone-jobs/test.job";
 
 assignProcessEnvs(__dirname);
 
@@ -57,7 +57,7 @@ class Server {
 
       this.app.use(express.json());
 
-      this.app.use(express.urlencoded({ extended: true }));
+      this.app.use(express.urlencoded({extended: true}));
 
       this.securityHelpers.setSecureHeaders();
       this.securityHelpers.initSecureHeadersMiddleware();
@@ -74,9 +74,9 @@ class Server {
 
       this.httpExceptionHandler.init();
 
-      await this.mySqlDataSource.testConnections();
+      // await this.mySqlDataSource.testConnections();
 
-      this.croneJobsWrapper.startAll();
+      // this.croneJobsWrapper.startAll();
 
       this.app.listen(this.config.expressApi.port, () => {
         this.logger.log(
@@ -90,7 +90,7 @@ class Server {
       const error = new ApplicationException(
         "Error starting API",
         ExceptionCodeEnum.EXPRESS_APP__START_ERR,
-        { cause: err }
+        {cause: err}
       );
       this.logger.log(LoggerLevelEnum.ERROR, new ErrorLog(error));
       throw error;

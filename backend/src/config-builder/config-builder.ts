@@ -1,8 +1,8 @@
-import { env } from "node:process";
+import {env} from "node:process";
 
-import { merge } from "lodash";
+import {merge} from "lodash";
 
-import { Config } from "./config.interface";
+import {Config} from "./config.interface";
 
 class ConfigBuilder {
   private static instance: ConfigBuilder | null = null;
