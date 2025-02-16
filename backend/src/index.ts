@@ -22,6 +22,7 @@ import {AppSentry} from "./loggers/sentry/sentry";
 import {MySqlDataSource} from "./data-sources/sql/sql-data-source";
 import {TrackerRouter} from "./api-server/tracker/router/tracker.router";
 import {TestJob} from "./cron/crone-jobs/test.job";
+import {RedisDataSource} from "./data-sources/redis/redis-data-source";
 
 assignProcessEnvs(__dirname);
 
@@ -44,6 +45,9 @@ class Server {
     new HttpExceptionHandlerService(this.app);
   private readonly mySqlDataSource: MySqlDataSource =
     MySqlDataSource.getInstance();
+  private readonly RedisDataSource: RedisDataSource =
+    RedisDataSource.getInstance();
+
   private readonly croneJobsWrapper: CronJobsWrapperService =
     new CronJobsWrapperService([new TestJob().getCroneJob()]);
 
@@ -74,7 +78,7 @@ class Server {
 
       this.httpExceptionHandler.init();
 
-      // await this.mySqlDataSource.testConnections();
+      await this.RedisDataSource.testConnections();
 
       // this.croneJobsWrapper.startAll();
 

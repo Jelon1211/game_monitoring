@@ -1,9 +1,5 @@
 import {Router, Request, Response, NextFunction} from "express";
-import {
-  IntegrationRoutes,
-  Routes,
-  Tracker,
-} from "../../main-router/routes.enum";
+import {Routes, Tracker} from "../../main-router/routes.enum";
 import {HttpException} from "../../../exceptions/http.exception";
 import {TrackerService} from "../serivce/tracker.service";
 

@@ -1,7 +1,7 @@
 {
-  "name": "ebiuro-api-portal",
+  "name": "game_monitoring",
   "version": "1.0.0",
-  "description": "handle ebiuro logic",
+  "description": "Handle game servers monitoring",
   "scripts": {
     "dev": "NODE_ENV=development DEBUG=* ts-node-dev --respawn --transpile-only --watch src src/index.ts",
     "start": "NODE_ENV=production node build/index.js",
@@ -30,6 +30,7 @@
     "D": "^1.0.0",
     "debug": "^4.3.4",
     "express": "^4.18.2",
+    "ioredis": "^5.5.0",
     "jsonschema": "^1.4.1",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",

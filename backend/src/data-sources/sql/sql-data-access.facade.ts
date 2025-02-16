@@ -1,5 +1,5 @@
-import { MySqlDataSource } from "./sql-data-source";
-import { AppLogger } from "../../loggers/logger-service/logger.service";
+import {MySqlDataSource} from "./sql-data-source";
+import {AppLogger} from "../../loggers/logger-service/logger.service";
 
 export class SqlDataAccessFacade {
   private static instance: SqlDataAccessFacade | null = null;

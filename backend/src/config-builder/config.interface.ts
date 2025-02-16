@@ -72,19 +72,6 @@ export interface ConfiguredPool {
   connection: MySqlConnection;
 }
 
-interface RabbitMqConnection {
-  hostname: string;
-  port: number;
-  username: string;
-  password: string;
-  vhost: string;
-}
-
-interface RabbitMqConsumerOption {
-  noAck: boolean;
-  exclusive: boolean;
-}
-
 interface Tls {
   ciphers: string;
   honorCipherOrder: boolean;
@@ -120,22 +107,14 @@ export interface Config {
   cron: Cron;
   timeInterval: TimeInterval;
   jwt: Jwt;
-  baselinker: BaseLinker;
-  apilo: Apilo;
-  ebiuroProxy: ebiuroProxy;
-}
-interface ebiuroProxy {
-  apiUrl: string;
-  apiToken: string;
+  redis: RedisConnection;
 }
 
-interface BaseLinker {
-  apiToken: string;
-  apiUrl: string;
-}
-
-interface Apilo {
-  crypto: string;
+interface RedisConnection {
+  connection: {
+    host: string;
+    port: number;
+  };
 }
 
 interface Jwt {
