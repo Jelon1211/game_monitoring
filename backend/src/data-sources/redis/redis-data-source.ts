@@ -58,8 +58,13 @@ export class RedisDataSource {
         await this.redis.set(key, value);
       }
       this.logger.log(LoggerLevelEnum.DEBUG, new InfoLog(`Redis set: ${key}`));
-    } catch (error) {
-      this.logger.log(LoggerLevelEnum.ERROR, new ErrorLog(error));
+    } catch (err) {
+      const error = new RedisException(
+        "Error executing Redis set function",
+        ExceptionCodeEnum.REDIS_SERVICE__CONN_ERR,
+        {cause: err}
+      );
+      this.logger.log(LoggerLevelEnum.ERROR, error);
     }
   }
 
@@ -68,8 +73,13 @@ export class RedisDataSource {
       const value = await this.redis.get(key);
       this.logger.log(LoggerLevelEnum.DEBUG, new InfoLog(`Redis get: ${key}`));
       return value;
-    } catch (error) {
-      this.logger.log(LoggerLevelEnum.ERROR, new ErrorLog(error));
+    } catch (err) {
+      const error = new RedisException(
+        "Error executing Redis get function",
+        ExceptionCodeEnum.REDIS_SERVICE__CONN_ERR,
+        {cause: err}
+      );
+      this.logger.log(LoggerLevelEnum.ERROR, error);
       return null;
     }
   }
@@ -81,8 +91,64 @@ export class RedisDataSource {
         LoggerLevelEnum.DEBUG,
         new InfoLog(`Redis delete: ${key}`)
       );
-    } catch (error) {
-      this.logger.log(LoggerLevelEnum.ERROR, new ErrorLog(error));
+    } catch (err) {
+      const error = new RedisException(
+        "Error executing Redis delete function",
+        ExceptionCodeEnum.REDIS_SERVICE__CONN_ERR,
+        {cause: err}
+      );
+      this.logger.log(LoggerLevelEnum.ERROR, error);
+    }
+  }
+
+  public async lpush(key: string, ...values: string[]): Promise<void> {
+    try {
+      await this.redis.lpush(key, ...values);
+      this.logger.log(
+        LoggerLevelEnum.DEBUG,
+        new InfoLog(`Redis LPUSH: ${key}`)
+      );
+    } catch (err) {
+      const error = new RedisException(
+        "Error executing Redis lpush function",
+        ExceptionCodeEnum.REDIS_SERVICE__CONN_ERR,
+        {cause: err}
+      );
+      this.logger.log(LoggerLevelEnum.ERROR, error);
+    }
+  }
+
+  public async ltrim(key: string, start: number, stop: number): Promise<void> {
+    try {
+      await this.redis.ltrim(key, start, stop);
+      this.logger.log(
+        LoggerLevelEnum.DEBUG,
+        new InfoLog(`Redis LTRIM: ${key}`)
+      );
+    } catch (err) {
+      const error = new RedisException(
+        "Error executing Redis ltrim function",
+        ExceptionCodeEnum.REDIS_SERVICE__CONN_ERR,
+        {cause: err}
+      );
+      this.logger.log(LoggerLevelEnum.ERROR, error);
+    }
+  }
+
+  public async expire(key: string, seconds: number): Promise<void> {
+    try {
+      await this.redis.expire(key, seconds);
+      this.logger.log(
+        LoggerLevelEnum.DEBUG,
+        new InfoLog(`Redis EXPIRE: ${key}`)
+      );
+    } catch (err) {
+      const error = new RedisException(
+        "Error executing Redis expire function",
+        ExceptionCodeEnum.REDIS_SERVICE__CONN_ERR,
+        {cause: err}
+      );
+      this.logger.log(LoggerLevelEnum.ERROR, error);
     }
   }
 

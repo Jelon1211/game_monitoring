@@ -8,6 +8,7 @@ import {SqlException} from "../../exceptions/sql.exception";
 import {ExceptionCodeEnum} from "../../exceptions/exception-code.enum";
 import {InfoLog} from "../../loggers/info-log/info-log.instance";
 import {ErrorLog} from "../../loggers/error-log/error-log.instance";
+import {CustomException} from "../../exceptions/custom-exception.interface";
 
 export class MySqlDataSource {
   private static instance: MySqlDataSource | null = null;
@@ -59,18 +60,22 @@ export class MySqlDataSource {
       this.debug("Waiting for available connection slot.");
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.mysqlPool.on("acquire", (connection: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       this.debug(`Connection acquired. Thread Id: ${connection.threadId}`);
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.mysqlPool.on("release", (connection: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       this.debug(`Connection released. Thread Id: ${connection.threadId}`);
     });
   }
 
   public executeQuery<T>(
     query: string,
-    params: any[] = [],
+    params: unknown[] = [],
     isWrite: boolean = false
   ): Promise<T> {
     if (!this.mysqlPool) {
@@ -87,7 +92,10 @@ export class MySqlDataSource {
     return new Promise<T>((resolve, reject) => {
       this.mysqlPool!.getConnection(poolType, (error, connection) => {
         if (error) {
-          this.logger.log(LoggerLevelEnum.ERROR, new ErrorLog(error));
+          this.logger.log(
+            LoggerLevelEnum.ERROR,
+            new ErrorLog(error as CustomException)
+          );
           connection?.release();
           return reject(error);
         }
@@ -95,7 +103,7 @@ export class MySqlDataSource {
         const formattedQuery = mysql.format(query, params);
         this.debug(`Executing query: ${formattedQuery}`);
 
-        connection.query(formattedQuery, (queryError, results: any) => {
+        connection.query(formattedQuery, (queryError, results: unknown) => {
           this.logger.log(
             LoggerLevelEnum.DEBUG,
             new InfoLog("Sql procedure called,", {query})

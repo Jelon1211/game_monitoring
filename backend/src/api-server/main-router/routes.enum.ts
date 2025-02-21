@@ -1,5 +1,5 @@
-export enum Tracker {
-  BASIC = "/tracker/basic",
+export enum RobloxTracker {
+  SERVER_RESTART = "/server_restart",
 }
 
 export enum Routes {
@@ -7,4 +7,5 @@ export enum Routes {
   CHECK = "/check",
   PING = "/ping",
   TELEMETRY = "/telemetry",
+  ROBLOX = "/roblox",
 }

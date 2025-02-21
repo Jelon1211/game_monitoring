@@ -10,7 +10,7 @@ export class AuthMiddleware {
   constructor(private readonly app: Express) {}
 
   public init({excludedRoutes}: {excludedRoutes: string[]}) {
-    this.app.use((req: Request, res: Response, next: NextFunction) => {
+    this.app.use((req: Request, _res: Response, next: NextFunction) => {
       const isExcluded = excludedRoutes.some((route) => {
         const matcher = match(route, {decode: decodeURIComponent});
         return matcher(req.originalUrl);

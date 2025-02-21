@@ -10,7 +10,7 @@ export class CheckRouter {
   constructor() {
     this.checkRouter.get(
       `${Routes.V1}${Routes.CHECK}${Routes.PING}`,
-      (req: Request, res: Response) => {
+      (_req: Request, res: Response) => {
         res.status(200).send("pong");
       }
     );
@@ -18,7 +18,7 @@ export class CheckRouter {
     this.checkRouter.get(
       `${Routes.V1}${Routes.CHECK}${Routes.TELEMETRY}`,
       async (
-        req: Request,
+        _req: Request,
         res: Response,
         next: NextFunction
       ): Promise<void> => {

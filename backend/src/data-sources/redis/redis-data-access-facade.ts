@@ -1,9 +1,7 @@
-import {AppLogger} from "../../loggers/logger-service/logger.service";
 import {RedisDataSource} from "./redis-data-source";
 
 export class RedisDataAccessFacade {
   private static instance: RedisDataAccessFacade | null = null;
-  private readonly logger: AppLogger = AppLogger.getInstance();
   private readonly redisDataSource: RedisDataSource =
     RedisDataSource.getInstance();
 
@@ -33,5 +31,17 @@ export class RedisDataAccessFacade {
   public async deleteCache(key: string): Promise<void> {
     const deleteValue = await this.redisDataSource.delete(key);
     return deleteValue;
+  }
+
+  public async pushToList(key: string, ...values: string[]): Promise<void> {
+    await this.redisDataSource.lpush(key, ...values);
+  }
+
+  public async trimList(key: string, maxSize: number): Promise<void> {
+    await this.redisDataSource.ltrim(key, 0, maxSize - 1);
+  }
+
+  public async setExpiration(key: string, ttl: number): Promise<void> {
+    await this.redisDataSource.expire(key, ttl);
   }
 }
