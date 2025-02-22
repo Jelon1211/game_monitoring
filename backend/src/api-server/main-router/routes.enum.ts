@@ -1,5 +1,7 @@
 export enum RobloxTracker {
   SERVER_RESTART = "/server_restart",
+  SERVER_STATUS = "/server_status",
+  ACTIVE_USERS = "/active_users",
 }
 
 export enum Routes {

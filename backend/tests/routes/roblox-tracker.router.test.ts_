@@ -1,57 +1,57 @@
-// import request from "supertest";
-// import express from "express";
-// import {RobloxTrackerService} from "../../src/api-server/roblox-tracker/serivce/roblox-tracker.service";
-// import {RobloxTrackerRouter} from "../../src/api-server/roblox-tracker/router/roblox-tracker.router";
-// import {ServerRestartDTO} from "../../src/api-server/roblox-tracker/interfaces";
-// import {EventTypeEnum} from "../../src/api-server/roblox-tracker/enums";
+import request from "supertest";
+import express from "express";
+import {RobloxTrackerService} from "../../src/api-server/roblox-tracker/serivce/roblox-tracker.service";
+import {RobloxTrackerRouter} from "../../src/api-server/roblox-tracker/router/roblox-tracker.router";
+import {ServerRestartDTO} from "../../src/api-server/roblox-tracker/interfaces";
+import {EventTypeEnum} from "../../src/api-server/roblox-tracker/enums";
 
-// jest.mock("../../src/modules/roblox-tracker/serivce/roblox-tracker.service");
+jest.mock("../../src/modules/roblox-tracker/serivce/roblox-tracker.service");
 
-// describe("RobloxTrackerRouter", () => {
-//   let app: express.Application;
-//   let serviceMock: jest.Mocked<RobloxTrackerService>;
+describe("RobloxTrackerRouter", () => {
+  let app: express.Application;
+  let serviceMock: jest.Mocked<RobloxTrackerService>;
 
-//   beforeEach(() => {
-//     app = express();
-//     app.use(express.json());
+  beforeEach(() => {
+    app = express();
+    app.use(express.json());
 
-//     serviceMock =
-//       new RobloxTrackerService() as jest.Mocked<RobloxTrackerService>;
-//     const router = new RobloxTrackerRouter();
+    serviceMock =
+      new RobloxTrackerService() as jest.Mocked<RobloxTrackerService>;
+    const router = new RobloxTrackerRouter();
 
-//     (router as any).robloxTrackerService = serviceMock;
+    (router as any).robloxTrackerService = serviceMock;
 
-//     app.use("/api", router.router);
-//   });
+    app.use("/api", router.router);
+  });
 
-//   it("powinien zwrócić 200 dla poprawnego żądania restartu serwera", async () => {
-//     const testData: ServerRestartDTO = {
-//       server_id: "123",
-//       event_type: EventTypeEnum.SERVER_RESTART,
-//       data: {message: "Restart"},
-//     };
+  it("powinien zwrócić 200 dla poprawnego żądania restartu serwera", async () => {
+    const testData: ServerRestartDTO = {
+      server_id: "123",
+      event_type: EventTypeEnum.SERVER_RESTART,
+      data: {message: "Restart"},
+    };
 
-//     const response = await request(app)
-//       .post("/api/v1/roblox/server-restart")
-//       .send(testData);
+    const response = await request(app)
+      .post("/api/v1/roblox/server-restart")
+      .send(testData);
 
-//     expect(response.status).toBe(200);
-//     expect(serviceMock.cacheRobloxServerData).toHaveBeenCalledWith(testData);
-//   });
+    expect(response.status).toBe(200);
+    expect(serviceMock.cacheRobloxServerData).toHaveBeenCalledWith(testData);
+  });
 
-//   it("powinien zwrócić 500 dla błędu w serwisie", async () => {
-//     serviceMock.cacheRobloxServerData.mockRejectedValue(
-//       new Error("Błąd wewnętrzny")
-//     );
+  it("powinien zwrócić 500 dla błędu w serwisie", async () => {
+    serviceMock.cacheRobloxServerData.mockRejectedValue(
+      new Error("Błąd wewnętrzny")
+    );
 
-//     const response = await request(app)
-//       .post("/api/v1/roblox/server-restart")
-//       .send({
-//         server_id: "123",
-//         event_type: EventTypeEnum.SERVER_RESTART,
-//         data: {message: "Restart"},
-//       });
+    const response = await request(app)
+      .post("/api/v1/roblox/server-restart")
+      .send({
+        server_id: "123",
+        event_type: EventTypeEnum.SERVER_RESTART,
+        data: {message: "Restart"},
+      });
 
-//     expect(response.status).toBe(500);
-//   });
-// });
+    expect(response.status).toBe(500);
+  });
+});

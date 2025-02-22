@@ -135,7 +135,7 @@ export const serverRestartSchema = {
     server_id: {type: "string", minLength: 1},
     event_type: {type: "string", enum: ["server_restart"]},
     data: {
-      type: "object",
+      type: "array",
       properties: {
         uptime: {type: "number", minimum: 0},
         reason: {type: "string", minLength: 1},
@@ -146,4 +146,76 @@ export const serverRestartSchema = {
   },
   additionalProperties: false,
   required: ["server_id", "data"],
+} as const;
+
+export const serverStatusSchema = {
+  type: "object",
+  properties: {
+    server_id: {type: "string", minLength: 1},
+    event_type: {type: "string", enum: ["server_stats"]},
+    data: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          max_players: {type: "number", minimum: 1},
+          uptime: {type: "number", minLength: 1},
+          online_count: {type: "number", minimum: 0},
+          server_load: {type: "number", minimum: 0, maximum: 1000},
+          map_name: {type: "number"},
+        },
+        additionalProperties: false,
+        required: [
+          "max_players",
+          "uptime",
+          "online_count",
+          "server_load",
+          "map_name",
+        ],
+      },
+    },
+  },
+  additionalProperties: false,
+  required: ["server_id", "event_type", "data"],
+} as const;
+
+export const activeUsersSchema = {
+  type: "object",
+  properties: {
+    server_id: {type: "string", minLength: 1},
+    event_type: {type: "string", enum: ["active_users"]},
+    data: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          name: {type: "string", minLength: 1},
+          session_duration: {type: "number", minimum: 0},
+          userid: {type: "number"},
+          join_time: {type: "number"},
+          position: {
+            type: "object",
+            properties: {
+              x: {type: "number"},
+              y: {type: "number"},
+              z: {type: "number"},
+            },
+            additionalProperties: false,
+            nullable: true,
+          },
+          device_type: {type: "string", enum: ["Mobile", "PC", "Console"]},
+        },
+        additionalProperties: false,
+        required: [
+          "name",
+          "session_duration",
+          "userid",
+          "join_time",
+          "device_type",
+        ],
+      },
+    },
+  },
+  additionalProperties: false,
+  required: ["server_id", "event_type", "data"],
 } as const;

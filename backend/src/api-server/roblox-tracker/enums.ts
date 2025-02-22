@@ -4,5 +4,12 @@ export enum EventTypeEnum {
   PLAYER_JOIN = "player_join",
   PLAYER_LEAVE = "player_leave",
   SERVER_RESTART = "server_restart",
-  PLAYERS_ONLINE = "players_online",
+  SERVER_STATUS = "server_status",
+  ACTIVE_USERS = "active_users",
+}
+
+export enum DeviceTypeEnum {
+  PC = "PC",
+  MOBILE = "Mobie",
+  CONSOLE = "Console",
 }
