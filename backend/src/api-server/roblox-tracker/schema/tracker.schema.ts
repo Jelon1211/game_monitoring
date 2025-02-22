@@ -1,141 +1,61 @@
-export const monitorPlayersSchema = {
-  type: "object",
-  properties: {
-    event: {type: "string"},
-    server_id: {type: "string", minLength: 0},
-    data: {
-      type: "array",
-      properties: {
-        players_online: {
-          type: "object",
-          properties: {
-            active_users: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  name: {type: "string", minLength: 1},
-                  userid: {type: "number"},
-                  join_time: {type: "number"},
-                  session_duration: {type: "number"},
-                  position: {
-                    type: ["object", "null"],
-                    properties: {
-                      x: {type: "number"},
-                      y: {type: "number"},
-                      z: {type: "number"},
-                    },
-                    required: ["x", "y", "z"],
-                  },
-                  device_type: {type: "string", enum: ["PC", "Mobile"]},
-                },
-                required: [
-                  "name",
-                  "userid",
-                  "join_time",
-                  "session_duration",
-                  "device_type",
-                ],
-              },
-            },
-            server_stats: {
-              type: "object",
-              properties: {
-                online_count: {type: "number"},
-                max_players: {type: "number"},
-                uptime: {type: "string"},
-                server_load: {type: "number"},
-                map_name: {type: "number"},
-              },
-              required: [
-                "online_count",
-                "max_players",
-                "uptime",
-                "server_load",
-                "map_name",
-              ],
-            },
-          },
-        },
-        player_join: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              userid: {type: "number"},
-              name: {type: "string", minLength: 1},
-              join_time: {type: "number"},
-            },
-            required: ["userid", "name", "join_time"],
-          },
-        },
-        player_leave: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              userid: {type: "number"},
-              name: {type: "string", minLength: 1},
-              session_duration: {type: "number"},
-            },
-            required: ["userid", "name", "session_duration"],
-          },
-        },
-        gamepass_purchase: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              player: {type: "string", minLength: 1},
-              pass_id: {type: "number"},
-            },
-            required: ["player", "pass_id"],
-          },
-        },
-        player_death: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              userid: {type: "number"},
-              name: {type: "string", minLength: 1},
-              death_cause: {type: "string", minLength: 1},
-              position: {
-                type: ["object", "null"],
-                properties: {
-                  x: {type: "number"},
-                  y: {type: "number"},
-                  z: {type: "number"},
-                },
-                required: ["x", "y", "z"],
-              },
-            },
-            required: ["userid", "name", "death_cause"],
-          },
-        },
-        server_restart: {
-          type: "object",
-          properties: {
-            uptime: {type: "string", minLength: 1},
-            reason: {type: "string", minLength: 1},
-          },
-          required: ["uptime", "reason"],
-        },
-      },
-      additionalProperties: false,
-    },
-  },
-  required: ["event", "server_id", "data"],
-  additionalProperties: false,
-};
-
-export const serverRestartSchema = {
+const baseSchema = {
   type: "object",
   properties: {
     server_id: {type: "string", minLength: 1},
+    event_type: {type: "string"},
+    data: {type: "array", items: {}},
+  },
+  additionalProperties: false,
+  required: ["server_id", "event_type", "data"],
+};
+
+const userProperties = {
+  userid: {type: "number", minimum: 1},
+  name: {type: "string", minLength: 1},
+};
+
+const positionProperties = {
+  type: "object",
+  properties: {
+    x: {type: "number"},
+    y: {type: "number"},
+    z: {type: "number"},
+  },
+  additionalProperties: false,
+  nullable: true,
+};
+
+const activeUserProperties = {
+  ...userProperties,
+  session_duration: {type: "number", minimum: 0},
+  join_time: {type: "number"},
+  position: positionProperties,
+  device_type: {type: "string", enum: ["Mobile", "PC", "Console"]},
+};
+
+const playerJoinProperties = {
+  ...userProperties,
+  join_time: {type: "number", minimum: 1},
+};
+
+const playerLeaveProperties = {
+  ...userProperties,
+  session_duration: {type: "number", minimum: 1},
+};
+
+const playerDeathProperties = {
+  ...userProperties,
+  death_cause: {type: "string", minLength: 1},
+  position: positionProperties,
+};
+
+export const serverRestartSchema = {
+  ...baseSchema,
+  properties: {
+    ...baseSchema.properties,
     event_type: {type: "string", enum: ["server_restart"]},
     data: {
-      type: "array",
+      type: "object",
       properties: {
         uptime: {type: "number", minimum: 0},
         reason: {type: "string", minLength: 1},
@@ -144,22 +64,20 @@ export const serverRestartSchema = {
       required: ["uptime", "reason"],
     },
   },
-  additionalProperties: false,
-  required: ["server_id", "data"],
 } as const;
 
 export const serverStatusSchema = {
-  type: "object",
+  ...baseSchema,
   properties: {
-    server_id: {type: "string", minLength: 1},
-    event_type: {type: "string", enum: ["server_stats"]},
+    ...baseSchema.properties,
+    event_type: {type: "string", enum: ["server_status"]},
     data: {
       type: "array",
       items: {
         type: "object",
         properties: {
           max_players: {type: "number", minimum: 1},
-          uptime: {type: "number", minLength: 1},
+          uptime: {type: "number", minimum: 1},
           online_count: {type: "number", minimum: 0},
           server_load: {type: "number", minimum: 0, maximum: 1000},
           map_name: {type: "number"},
@@ -175,36 +93,18 @@ export const serverStatusSchema = {
       },
     },
   },
-  additionalProperties: false,
-  required: ["server_id", "event_type", "data"],
 } as const;
 
 export const activeUsersSchema = {
-  type: "object",
+  ...baseSchema,
   properties: {
-    server_id: {type: "string", minLength: 1},
+    ...baseSchema.properties,
     event_type: {type: "string", enum: ["active_users"]},
     data: {
       type: "array",
       items: {
         type: "object",
-        properties: {
-          name: {type: "string", minLength: 1},
-          session_duration: {type: "number", minimum: 0},
-          userid: {type: "number"},
-          join_time: {type: "number"},
-          position: {
-            type: "object",
-            properties: {
-              x: {type: "number"},
-              y: {type: "number"},
-              z: {type: "number"},
-            },
-            additionalProperties: false,
-            nullable: true,
-          },
-          device_type: {type: "string", enum: ["Mobile", "PC", "Console"]},
-        },
+        properties: activeUserProperties,
         additionalProperties: false,
         required: [
           "name",
@@ -216,6 +116,75 @@ export const activeUsersSchema = {
       },
     },
   },
-  additionalProperties: false,
-  required: ["server_id", "event_type", "data"],
+} as const;
+
+export const playerJoinSchema = {
+  ...baseSchema,
+  properties: {
+    ...baseSchema.properties,
+    event_type: {type: "string", enum: ["player_join"]},
+    data: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: playerJoinProperties,
+        additionalProperties: false,
+        required: ["userid", "name", "join_time"],
+      },
+    },
+  },
+} as const;
+
+export const playerLeaveSchema = {
+  ...baseSchema,
+  properties: {
+    ...baseSchema.properties,
+    event_type: {type: "string", enum: ["player_leave"]},
+    data: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: playerLeaveProperties,
+        additionalProperties: false,
+        required: ["userid", "name", "session_duration"],
+      },
+    },
+  },
+} as const;
+
+export const gamepassPurchaseSchema = {
+  ...baseSchema,
+  properties: {
+    ...baseSchema.properties,
+    event_type: {type: "string", enum: ["gamepass_purchase"]},
+    data: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          player: {type: "string", minLength: 1},
+          pass_id: {type: "number", minimum: 1},
+        },
+        additionalProperties: false,
+        required: ["player", "pass_id"],
+      },
+    },
+  },
+} as const;
+
+export const playerDeathSchema = {
+  ...baseSchema,
+  properties: {
+    ...baseSchema.properties,
+    event_type: {type: "string", enum: ["player_death"]},
+    data: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: playerDeathProperties,
+        additionalProperties: false,
+        required: ["userid", "name", "death_cause"],
+      },
+    },
+  },
 } as const;

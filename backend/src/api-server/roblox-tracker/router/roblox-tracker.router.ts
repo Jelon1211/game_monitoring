@@ -6,93 +6,124 @@ import {AppLogger} from "../../../loggers/logger-service/logger.service";
 import {LoggerLevelEnum} from "../../../loggers/log-level/logger-level.enum";
 import {ValidationMiddleware} from "../../../validation/middleware/validation.middleware";
 import {ErrorLog} from "../../../loggers/error-log/error-log.instance";
-import {
-  serverStatusSchema,
-  serverRestartSchema,
-  activeUsersSchema,
-} from "../schema/tracker.schema";
+import * as schemas from "../schema/tracker.schema";
+import {CustomException} from "../../../exceptions/custom-exception.interface";
+
 import {
   ActiveUsersDTO,
-  PlayersOnlineDTO,
+  GamepassPurchaseDTO,
+  PlayerDeathDTO,
+  PlayerJoinDTO,
+  PlayerLeaveDTO,
   ServerRestartDTO,
   ServerStatusDTO,
 } from "../interfaces";
-import {CustomException} from "../../../exceptions/custom-exception.interface";
 
 export class RobloxTrackerRouter {
   private readonly integrationRouter = Router();
   private readonly robloxTrackerService = new RobloxTrackerService();
   private readonly logger: AppLogger = AppLogger.getInstance();
 
+  private readonly endpoints = [
+    {
+      path: RobloxTracker.SERVER_RESTART,
+      schema: schemas.serverRestartSchema,
+      type: "ServerRestartDTO",
+    },
+    {
+      path: RobloxTracker.SERVER_STATUS,
+      schema: schemas.serverStatusSchema,
+      type: "ServerStatusDTO",
+    },
+    {
+      path: RobloxTracker.ACTIVE_USERS,
+      schema: schemas.activeUsersSchema,
+      type: "ActiveUsersDTO",
+    },
+    {
+      path: RobloxTracker.PLAYER_JOIN,
+      schema: schemas.playerJoinSchema,
+      type: "PlayerJoinDTO",
+    },
+    {
+      path: RobloxTracker.PLAYER_LEAVE,
+      schema: schemas.playerLeaveSchema,
+      type: "PlayerLeaveDTO",
+    },
+    {
+      path: RobloxTracker.PLAYER_DEATH,
+      schema: schemas.playerDeathSchema,
+      type: "PlayerDeathDTO",
+    },
+    {
+      path: RobloxTracker.GAMEPASS_PURCHASE,
+      schema: schemas.gamepassPurchaseSchema,
+      type: "GamepassPurchaseDTO",
+    },
+  ] as const;
+
   constructor() {
-    this.integrationRouter.post(
-      `${Routes.V1}${Routes.ROBLOX}${RobloxTracker.SERVER_RESTART}`,
-      ValidationMiddleware.validate(serverRestartSchema),
-      async (req: Request, res: Response, next: NextFunction) => {
-        try {
-          const serverRestartData = req.body as ServerRestartDTO;
-          res.status(200).end();
-          await this.robloxTrackerService.cacheRobloxServerData(
-            serverRestartData
-          );
-        } catch (err) {
-          const error = new HttpException("Internal server error", 500, {
-            cause: err,
-          });
-          this.logger.log(
-            LoggerLevelEnum.ERROR,
-            new ErrorLog(err as CustomException)
-          );
-          next(error);
-        }
-      }
-    );
+    this.registerEndpoints();
+  }
 
-    this.integrationRouter.post(
-      `${Routes.V1}${Routes.ROBLOX}${RobloxTracker.SERVER_STATUS}`,
-      ValidationMiddleware.validate(serverStatusSchema),
-      async (req: Request, res: Response, next: NextFunction) => {
-        try {
-          const serverStatusData = req.body as ServerStatusDTO;
-          res.status(200).end();
-          await this.robloxTrackerService.cacheRobloxServerData(
-            serverStatusData
-          );
-        } catch (err) {
-          const error = new HttpException("Internal server error", 500, {
-            cause: err,
-          });
-          this.logger.log(
-            LoggerLevelEnum.ERROR,
-            new ErrorLog(err as CustomException)
-          );
-          next(error);
-        }
-      }
-    );
+  private registerEndpoints() {
+    this.endpoints.forEach(({path, schema, type}) => {
+      this.integrationRouter.post(
+        `${Routes.V1}${Routes.ROBLOX}${path}`,
+        ValidationMiddleware.validate(schema),
+        async (req: Request, res: Response, next: NextFunction) => {
+          try {
+            // eslint-disable-next-line init-declarations
+            let data:
+              | ServerRestartDTO
+              | ServerStatusDTO
+              | ActiveUsersDTO
+              | PlayerJoinDTO
+              | PlayerLeaveDTO
+              | PlayerDeathDTO
+              | GamepassPurchaseDTO;
 
-    this.integrationRouter.post(
-      `${Routes.V1}${Routes.ROBLOX}${RobloxTracker.ACTIVE_USERS}`,
-      ValidationMiddleware.validate(activeUsersSchema),
-      async (req: Request, res: Response, next: NextFunction) => {
-        try {
-          const activeUsersData = req.body as ActiveUsersDTO;
-          res.status(200).end();
-          await this.robloxTrackerService.cacheRobloxServerData(
-            activeUsersData
-          );
-        } catch (err) {
-          const error = new HttpException("Internal server error", 500, {
-            cause: err,
-          });
-          this.logger.log(
-            LoggerLevelEnum.ERROR,
-            new ErrorLog(err as CustomException)
-          );
-          next(error);
+            switch (type) {
+              case "ServerRestartDTO":
+                data = req.body as ServerRestartDTO;
+                break;
+              case "ServerStatusDTO":
+                data = req.body as ServerStatusDTO;
+                break;
+              case "ActiveUsersDTO":
+                data = req.body as ActiveUsersDTO;
+                break;
+              case "PlayerJoinDTO":
+                data = req.body as PlayerJoinDTO;
+                break;
+              case "PlayerLeaveDTO":
+                data = req.body as PlayerLeaveDTO;
+                break;
+              case "PlayerDeathDTO":
+                data = req.body as PlayerDeathDTO;
+                break;
+              case "GamepassPurchaseDTO":
+                data = req.body as GamepassPurchaseDTO;
+                break;
+              default:
+                throw new HttpException("Invalid request type", 400);
+            }
+
+            res.status(200).end();
+            await this.robloxTrackerService.cacheRobloxServerData(data);
+          } catch (err) {
+            const error = new HttpException("Internal server error", 500, {
+              cause: err,
+            });
+            this.logger.log(
+              LoggerLevelEnum.ERROR,
+              new ErrorLog(err as CustomException)
+            );
+            next(error);
+          }
         }
-      }
-    );
+      );
+    });
   }
 
   public get router(): Router {

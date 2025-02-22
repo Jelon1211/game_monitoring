@@ -35,3 +35,31 @@ interface PlayerPosition {
   z: number;
 }
 export type ActiveUsersDTO = RobloxDTO<ActiveUsers[]>;
+
+interface PlayerJoin {
+  userid: number;
+  name: string;
+  join_time: number;
+}
+export type PlayerJoinDTO = RobloxDTO<PlayerJoin[]>;
+
+interface PlayerLeave {
+  userid: number;
+  name: string;
+  session_duration: number;
+}
+export type PlayerLeaveDTO = RobloxDTO<PlayerLeave[]>;
+
+interface PlayerDeath {
+  userid: number;
+  name: string;
+  death_cause: string;
+  position?: PlayerPosition;
+}
+export type PlayerDeathDTO = RobloxDTO<PlayerDeath[]>;
+
+interface GamepassPurchase {
+  player: string;
+  pass_id: number;
+}
+export type GamepassPurchaseDTO = RobloxDTO<GamepassPurchase[]>;
