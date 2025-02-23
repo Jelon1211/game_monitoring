@@ -77,7 +77,7 @@ export const serverStatusSchema = {
         type: "object",
         properties: {
           max_players: {type: "number", minimum: 1},
-          uptime: {type: "number", minimum: 1},
+          uptime: {type: "number", minimum: 0},
           online_count: {type: "number", minimum: 0},
           server_load: {type: "number", minimum: 0, maximum: 1000},
           map_name: {type: "number"},
