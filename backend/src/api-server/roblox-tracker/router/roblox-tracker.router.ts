@@ -20,7 +20,7 @@ import {
 } from "../interfaces";
 
 export class RobloxTrackerRouter {
-  private readonly integrationRouter = Router();
+  private readonly robloxTarackerRouter = Router();
   private readonly robloxTrackerService = new RobloxTrackerService();
   private readonly logger: AppLogger = AppLogger.getInstance();
 
@@ -68,7 +68,7 @@ export class RobloxTrackerRouter {
 
   private registerEndpoints() {
     this.endpoints.forEach(({path, schema, type}) => {
-      this.integrationRouter.post(
+      this.robloxTarackerRouter.post(
         `${Routes.V1}${Routes.ROBLOX}${path}`,
         ValidationMiddleware.validate(schema),
         async (req: Request, res: Response, next: NextFunction) => {
@@ -124,9 +124,16 @@ export class RobloxTrackerRouter {
         }
       );
     });
+
+    if (process.env.NODE_ENV === "test") {
+      console.log("TEST MODE ENABLED: Adding /trigger-error route");
+      this.robloxTarackerRouter.get("/trigger-error", (_req, _res, next) => {
+        next(new HttpException("Internal server error", 500));
+      });
+    }
   }
 
   public get router(): Router {
-    return this.integrationRouter;
+    return this.robloxTarackerRouter;
   }
 }

@@ -1,15 +1,15 @@
-import { CustomException } from "./custom-exception.interface";
-import { ExceptionCodeEnum } from "./exception-code.enum";
+import {CustomException} from "./custom-exception.interface";
+import {ExceptionCodeEnum} from "./exception-code.enum";
 
 export class TrackerException extends Error implements CustomException {
-  readonly name = "INTEGRATION EXCEPTION";
+  readonly name = "TRACKER EXCEPTION";
   readonly cause: unknown;
   alreadyLogged: boolean = false;
 
   constructor(
     readonly message: string,
     readonly errorCode: ExceptionCodeEnum,
-    options?: { cause: unknown }
+    options?: {cause: unknown}
   ) {
     super(message, {
       cause: options?.cause,

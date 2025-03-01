@@ -7,10 +7,10 @@ export interface RobloxDTO<T> {
 }
 
 interface ServerRestart {
-  uptime: string;
+  uptime: number;
   reason: string;
 }
-export type ServerRestartDTO = RobloxDTO<ServerRestart[]>;
+export type ServerRestartDTO = RobloxDTO<ServerRestart>;
 
 interface ServerStatus {
   max_players: number;
@@ -24,7 +24,7 @@ export type ServerStatusDTO = RobloxDTO<ServerStatus[]>;
 interface ActiveUsers {
   name: string;
   session_duration: number;
-  user_id: number;
+  userid: number;
   join_time: number;
   position?: PlayerPosition;
   device_type: DeviceTypeEnum;
