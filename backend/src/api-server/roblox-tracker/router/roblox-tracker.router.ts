@@ -1,5 +1,5 @@
 import {Router, Request, Response, NextFunction} from "express";
-import {Routes, RobloxTracker} from "../../main-router/routes.enum";
+import {Routes} from "../../main-router/routes.enum";
 import {HttpException} from "../../../exceptions/http.exception";
 import {RobloxTrackerService} from "../serivce/roblox-tracker.service";
 import {AppLogger} from "../../../loggers/logger-service/logger.service";
@@ -18,6 +18,7 @@ import {
   ServerRestartDTO,
   ServerStatusDTO,
 } from "../interfaces";
+import {EventTypeEnum} from "../enums";
 
 export class RobloxTrackerRouter {
   private readonly robloxTarackerRouter = Router();
@@ -26,37 +27,37 @@ export class RobloxTrackerRouter {
 
   private readonly endpoints = [
     {
-      path: RobloxTracker.SERVER_RESTART,
+      path: `/${EventTypeEnum.SERVER_RESTART}`,
       schema: schemas.serverRestartSchema,
       type: "ServerRestartDTO",
     },
     {
-      path: RobloxTracker.SERVER_STATUS,
+      path: `/${EventTypeEnum.SERVER_STATUS}`,
       schema: schemas.serverStatusSchema,
       type: "ServerStatusDTO",
     },
     {
-      path: RobloxTracker.ACTIVE_USERS,
+      path: `/${EventTypeEnum.ACTIVE_USERS}`,
       schema: schemas.activeUsersSchema,
       type: "ActiveUsersDTO",
     },
     {
-      path: RobloxTracker.PLAYER_JOIN,
+      path: `/${EventTypeEnum.PLAYER_JOIN}`,
       schema: schemas.playerJoinSchema,
       type: "PlayerJoinDTO",
     },
     {
-      path: RobloxTracker.PLAYER_LEAVE,
+      path: `/${EventTypeEnum.PLAYER_LEAVE}`,
       schema: schemas.playerLeaveSchema,
       type: "PlayerLeaveDTO",
     },
     {
-      path: RobloxTracker.PLAYER_DEATH,
+      path: `/${EventTypeEnum.PLAYER_DEATH}`,
       schema: schemas.playerDeathSchema,
       type: "PlayerDeathDTO",
     },
     {
-      path: RobloxTracker.GAMEPASS_PURCHASE,
+      path: `/${EventTypeEnum.GAMEPASS_PURCHASE}`,
       schema: schemas.gamepassPurchaseSchema,
       type: "GamepassPurchaseDTO",
     },

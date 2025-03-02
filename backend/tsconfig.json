@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "NodeNext",
-    "rootDir": "src",
+    "rootDirs": ["src", "tests"],
     "outDir": "dist",
     "strict": true,
     "moduleResolution": "NodeNext",
@@ -22,5 +22,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": ["src/**/*.ts", "types/**/*.d.ts", "tests"]
+  "include": ["src/**/*.ts", "types/**/*.d.ts", "tests/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
