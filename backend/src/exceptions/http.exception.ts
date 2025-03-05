@@ -1,4 +1,5 @@
 export class HttpException extends Error {
+  public status: number;
   readonly name = "HTTP EXCEPTION";
   readonly cause: unknown;
 
@@ -11,5 +12,6 @@ export class HttpException extends Error {
       cause: options?.cause,
     });
     this.cause = options?.cause;
+    this.status = httpCode;
   }
 }
