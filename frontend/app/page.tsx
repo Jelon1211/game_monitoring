@@ -15,7 +15,7 @@ export default async function Home() {
       {user ? (
         <>
           <p>Welcome back{user.firstName && `, ${user.firstName}`}</p>
-          <Link href="/dashboard">dashboard</Link>
+          <Link href="/panel/dashboard">dashboard</Link>
         </>
       ) : (
         <div className="flex flex-col">
