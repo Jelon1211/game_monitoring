@@ -53,7 +53,7 @@ config.mysqlRead = {
 	connection: {
 		connectionLimit: 10,
 		host:            '',
-		timezone:        'Europe/Warsaw',
+		timezone:        'Z',
 		port:            null,
 		database:        '',
 		user:            '',
@@ -67,7 +67,7 @@ config.mysqlWrite = {
 	connection: {
 		connectionLimit: 10,
 		host:            '',
-		timezone:        'Europe/Warsaw',
+		timezone:        'Z',
 		port:            null,
 		database:        '',
 		user:            '',
@@ -77,26 +77,7 @@ config.mysqlWrite = {
 };
 
 config.cron = {
-	cronTimeSyncApiloProducts: '',
+	test: '',
 };
-
-config.baselinker = {
-	apiUrl: '',
-};
-
-config.apilo = {
-	crypto: '',
-};
-
-config.jwt = {
-	secret: ''
-}
-
-config.ebiuroProxy = {
-	apiToken: '',
-	apiUrl:   '',
-};
-
-config.paymentoProxy = {}
 
 module.exports = config;

@@ -1,21 +1,28 @@
-import { redisHelper } from "@/lib/redis/redisHelper";
+import {
+  getSignInUrl,
+  getSignUpUrl,
+  withAuth,
+} from "@workos-inc/authkit-nextjs";
+import Link from "next/link";
 
-export default async function Page() {
-  const test = await redisHelper.get("server_id:jelon_0_0_1", true);
-  console.log("tutaj test --> ", JSON.stringify(test));
+export default async function Home() {
+  const { user } = await withAuth();
+  const signInUrl = await getSignInUrl();
+  const signUpUrl = await getSignUpUrl();
+
   return (
-    <main className="flex min-h-screen flex-col ">
-      <ul>
-        {test ? (
-          test.map((item: any, index: number) => (
-            <li key={index} className="border p-2">
-              {JSON.stringify(item)}
-            </li>
-          ))
-        ) : (
-          <li>Brak danych w Redis</li>
-        )}
-      </ul>
-    </main>
+    <div className="text-2xl">
+      {user ? (
+        <>
+          <p>Welcome back{user.firstName && `, ${user.firstName}`}</p>
+          <Link href="/dashboard">dashboard</Link>
+        </>
+      ) : (
+        <div className="flex flex-col">
+          <Link href={signInUrl}>Sign in</Link>
+          <Link href={signUpUrl}>Sign up</Link>
+        </div>
+      )}
+    </div>
   );
 }

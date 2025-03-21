@@ -1,11 +1,14 @@
-import NextAuth from "next-auth";
-import { authConfig } from "./auth.config";
+import { authkitMiddleware } from '@workos-inc/authkit-nextjs';
 
-export default NextAuth(authConfig).auth;
+// In middleware auth mode, each page is protected by default.
+// Exceptions are configured via the `unauthenticatedPaths` option.
+export default authkitMiddleware({
+  middlewareAuth: {
+    enabled: true,
+    unauthenticatedPaths: ['/'],
+  },
+});
 
-export const config = {
-  // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
-  matcher: [
-    "/((?!api|_next/static|_next/image|.*\\.svg$|.*\\.png$|.*\\.jpeg$).*)",
-  ],
-};
+// Match against pages that require authentication
+// Leave this out if you want authentication on every page in your application
+export const config = { matcher: ['/', '/dashboard/:page*'] };
