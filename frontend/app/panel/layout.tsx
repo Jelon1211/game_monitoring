@@ -11,9 +11,9 @@ export default async function PanelLayout({
 
   return (
     <UserProvider user={user}>
-      <div className="">
+      <div>
         <Sidebar />
-        <main className="p-4 sm:ml-64">{children}</main>
+        <main className="p-4 sm:ml-64 mt-14">{children}</main>
       </div>
     </UserProvider>
   );

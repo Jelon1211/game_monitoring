@@ -45,7 +45,7 @@ export default function Sidebar() {
       <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
         <div className="px-3 py-3 lg:px-5 lg:pl-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center justify-start rtl:justify-end">
+            <div className="flex items-center justify-start rtl:justify-end gap-1">
               <button
                 ref={buttonRef}
                 onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -85,24 +85,23 @@ export default function Sidebar() {
           <ul className="space-y-2 font-medium">
             {userRoutes.map((route) => (
               <li key={route.href} className="flex justify-start items-center">
-                {route.icon && <route.icon />}
                 <Link
                   href={route.href}
-                  className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  className="w-full gap-4 flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                 >
-                  {route.label}
+                  {route.icon && <route.icon />}
+                  <span>{route.label}</span>
                 </Link>
               </li>
             ))}
           </ul>
           <div
-            id="dropdown-cta"
             className="p-4 mt-6 rounded-lg bg-blue-50 dark:bg-blue-900"
             role="alert"
           >
             <div className="flex items-center mb-3">
               <span className="bg-orange-100 text-orange-800 text-sm font-semibold me-2 px-2.5 py-0.5 rounded-sm dark:bg-orange-200 dark:text-orange-900">
-                Beta
+                Alpha
               </span>
             </div>
             <p className="mb-3 text-sm text-blue-800 dark:text-blue-400">
