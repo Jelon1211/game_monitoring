@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { RefObject } from "react";
-import { useUser } from "@/app/context/user-context";
+import { useUser } from "@/context/user-context";
 
 export default function UserAvatarButton({
   onClick,

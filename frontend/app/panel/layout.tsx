@@ -1,6 +1,6 @@
 import Sidebar from "@/components/layouts/Sidebar";
+import { UserProvider } from "@/context/user-context";
 import { withAuth } from "@workos-inc/authkit-nextjs";
-import { UserProvider } from "../context/user-context";
 
 export default async function PanelLayout({
   children,

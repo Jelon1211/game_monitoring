@@ -1,7 +1,7 @@
 "use client";
 import { RefObject } from "react";
-import { useUser } from "@/app/context/user-context";
-import { handleSignOut } from "@/app/actions/signOut";
+import { useUser } from "@/context/user-context";
+import { handleSignOut } from "@/lib/actions/signOut";
 import { appRoutes } from "@/config/routes";
 import Link from "next/link";
 import { RouteGroup } from "@/enums/routes";
