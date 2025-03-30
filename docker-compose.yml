@@ -10,6 +10,11 @@ services:
       - NODE_ENV=development
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=youruser
+      - POSTGRES_PASSWORD=yourpassword
+      - POSTGRES_DB=yourdatabase
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -17,6 +22,7 @@ services:
     restart: unless-stopped
     depends_on:
       - redis
+      - postgres
 
   frontend:
     build:
@@ -44,5 +50,19 @@ services:
     volumes:
       - redis_data:/data
 
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      - POSTGRES_DB=game_monitoring
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=yourpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
 volumes:
   redis_data:
+  postgres_data:

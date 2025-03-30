@@ -5,7 +5,6 @@ export default function PlusIcon(props: SVGProps<SVGSVGElement>) {
     <p className="text-2xl text-gray-400 dark:text-gray-500">
       <svg
         className="w-3.5 h-3.5"
-        aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 18 18"
