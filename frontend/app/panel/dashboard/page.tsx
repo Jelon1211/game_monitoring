@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   //   "sample_leaderboard:tetris"
   // );
 
-  const widgetDelays = [3000, 5000, 7000];
+  const widgetDelays = [300, 500, 700];
 
   return (
     <div className="p-4">
