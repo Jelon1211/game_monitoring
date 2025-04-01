@@ -5,13 +5,23 @@ import Modal from "./Modal";
 import CloseModalIcon from "../icons/CloseModalIcon";
 import { RightArrowIcon } from "../icons";
 import ModalHeader from "./components/ModalHeader";
+import { generateJWT } from "@/lib/actions/generateJWT";
+import { SupportedPlatforms } from "@/enums/platforms";
+import { JwtPayload } from "@/types/jwt";
+import { useUser } from "@/context/user-context";
 
 export default function GenerateTokenModal() {
+  const { user } = useUser();
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [step, setStep] = useState<number>(1);
-  const [selectedGame, setSelectedGame] = useState<string | null>(null);
+  const [selectedGame, setSelectedGame] = useState<SupportedPlatforms | null>(
+    null
+  );
+  const [tokenName, setTokenName] = useState<string>("");
+  const [tokenDescription, setTokenDescription] = useState<string>("");
 
-  const handleSelect = (val: string) => setSelectedGame(val);
+  const handleSelect = (val: SupportedPlatforms) => setSelectedGame(val);
   const handleNext = () => {
     if (selectedGame) setStep(2);
   };
@@ -24,6 +34,17 @@ export default function GenerateTokenModal() {
       setStep(1);
       setSelectedGame(null);
     }, 300);
+  };
+
+  const handleGenerateJWT = async () => {
+    const jwtPayload: JwtPayload = {
+      platform: selectedGame!,
+      name: tokenName,
+      description: tokenDescription,
+      user_id: user!.id,
+      role: "free",
+    };
+    return await generateJWT(jwtPayload);
   };
 
   return (
@@ -72,7 +93,7 @@ export default function GenerateTokenModal() {
                       value="job-1"
                       className="hidden peer"
                       required
-                      onChange={() => handleSelect("roblox")}
+                      onChange={() => handleSelect(SupportedPlatforms.ROBLOX)}
                     />
                     <label
                       htmlFor="job-1"
@@ -121,6 +142,8 @@ export default function GenerateTokenModal() {
                     type="text"
                     id="default-input"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    value={tokenName}
+                    onChange={(e) => setTokenName(e.target.value)}
                   />
                 </div>
                 <div className="mb-6">
@@ -134,11 +157,14 @@ export default function GenerateTokenModal() {
                     type="text"
                     id="default-input"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    value={tokenDescription}
+                    onChange={(e) => setTokenDescription(e.target.value)}
                   />
                 </div>
                 <button
                   type="button"
                   className="focus:outline-none w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 cursor-pointer"
+                  onClick={handleGenerateJWT}
                 >
                   Generate token
                 </button>
@@ -146,7 +172,7 @@ export default function GenerateTokenModal() {
                 <button
                   className="text-white inline-flex w-full justify-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer"
                   disabled={!selectedGame}
-                  onClick={handleBack}
+                  onClick={() => handleBack()}
                 >
                   Go back
                 </button>

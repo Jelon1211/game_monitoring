@@ -11,7 +11,7 @@ export const GET = handleAuth({
       await postgresHelper.transaction(async (client) => {
         await client.query(
           `
-            INSERT INTO users (workos_user_id, account_type)
+            INSERT INTO user (workos_user_id, account_type)
             VALUES ($1, $2)
             ON CONFLICT (workos_user_id) DO NOTHING;
             `,
