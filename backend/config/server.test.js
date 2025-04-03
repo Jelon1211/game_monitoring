@@ -1,6 +1,6 @@
 const config = (module.exports = {});
 
-config.application = "ebiuro-api-portal";
+config.application = "game_monitoring";
 
 config.expressApi = {
   bind: "0.0.0.0",
@@ -53,7 +53,7 @@ config.mysqlRead = {
     host: "",
     timezone: "Europe/Warsaw",
     port: 3306,
-    database: "ebiuro-main",
+    database: "",
     user: "",
     password: "",
     charset: "UTF8_GENERAL_CI",
@@ -67,7 +67,7 @@ config.mysqlWrite = {
     host: "",
     timezone: "Europe/Warsaw",
     port: 3306,
-    database: "ebiuro-main",
+    database: "",
     user: "",
     password: "",
     charset: "UTF8_GENERAL_CI",

@@ -1,3 +1,5 @@
+import {Secret} from "jsonwebtoken";
+
 interface ExpressApi {
   bind: string;
   port: number;
@@ -108,6 +110,12 @@ export interface Config {
   timeInterval: TimeInterval;
   jwt: Jwt;
   redis: RedisConnection;
+  secret: Secret;
+  allowedOrigins: string[];
+}
+
+interface Secret {
+  jwt: string;
 }
 
 interface RedisConnection {
@@ -122,7 +130,7 @@ interface Jwt {
 }
 
 export interface Merchant {
-  uuid: string;
-  company_id: string;
-  user_id: string;
+  sub: string;
+  role: string;
+  platform: string;
 }

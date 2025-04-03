@@ -13,6 +13,7 @@ export class HttpExceptionHandlerService {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _next: NextFunction
       ): void => {
+        console.log("tutaj error", error);
         if (error instanceof HttpException) {
           res.status(error.httpCode).json({
             ok: false,

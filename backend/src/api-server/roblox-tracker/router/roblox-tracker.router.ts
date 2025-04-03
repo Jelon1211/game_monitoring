@@ -1,5 +1,5 @@
 import {Router, Request, Response, NextFunction} from "express";
-import {Routes} from "../../main-router/routes.enum";
+import {Platform, Routes} from "../../main-router/routes.enum";
 import {HttpException} from "../../../exceptions/http.exception";
 import {RobloxTrackerService} from "../serivce/roblox-tracker.service";
 import {AppLogger} from "../../../loggers/logger-service/logger.service";
@@ -70,7 +70,7 @@ export class RobloxTrackerRouter {
   private registerEndpoints() {
     this.endpoints.forEach(({path, schema, type}) => {
       this.robloxTarackerRouter.post(
-        `${Routes.V1}${Routes.ROBLOX}${path}`,
+        `${Routes.V1}${Platform.ROBLOX}${path}`,
         ValidationMiddleware.validate(schema),
         async (req: Request, res: Response, next: NextFunction) => {
           try {

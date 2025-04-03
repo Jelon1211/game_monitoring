@@ -2,7 +2,10 @@ import request from "supertest";
 import express, {Express} from "express";
 import "../../mocks/logger.mock";
 import {RobloxTrackerRouter} from "../../../src/api-server/roblox-tracker/router/roblox-tracker.router";
-import {Routes} from "../../../src/api-server/main-router/routes.enum";
+import {
+  Platform,
+  Routes,
+} from "../../../src/api-server/main-router/routes.enum";
 import {EventTypeEnum} from "../../../src/api-server/roblox-tracker/enums";
 import {MainRouter} from "../../../src/api-server/main-router/main.router";
 import {HttpExceptionHandlerService} from "../../../src/api-server/exception-handling/http-exception-handler/http.exception-handler.service";
@@ -24,7 +27,7 @@ describe("RobloxTrackerRouter", () => {
   testCases.forEach(({dto}) => {
     it(`should return 200 for valid ${dto.event_type} request`, async () => {
       const response = await request(app)
-        .post(`${Routes.V1}${Routes.ROBLOX}/${dto.event_type}`)
+        .post(`${Routes.V1}${Platform.ROBLOX}/${dto.event_type}`)
         .send(dto);
 
       expect(response.status).toBe(200);
@@ -33,7 +36,7 @@ describe("RobloxTrackerRouter", () => {
 
   it("should return 400 for invalid request", async () => {
     const response = await request(app)
-      .post(`${Routes.V1}${Routes.ROBLOX}/${EventTypeEnum.SERVER_RESTART}`)
+      .post(`${Routes.V1}${Platform.ROBLOX}/${EventTypeEnum.SERVER_RESTART}`)
       .send({invalidField: "test"});
 
     expect(response.status).toBe(400);

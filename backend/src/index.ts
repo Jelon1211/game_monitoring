@@ -23,6 +23,8 @@ import {AppSentry} from "./loggers/sentry/sentry";
 import {RobloxTrackerRouter} from "./api-server/roblox-tracker/router/roblox-tracker.router";
 import {TestJob} from "./cron/crone-jobs/test.job";
 import {RedisDataSource} from "./data-sources/redis/redis-data-source";
+import {StrictRequestMiddleware} from "./api-server/auth/strict.request.middleware";
+import {RequestLoggerMiddleware} from "./api-server/logging/request-logger.middleware";
 
 assignProcessEnvs(__dirname);
 
@@ -39,13 +41,15 @@ class Server {
     this.app
   );
   private authMiddleware: AuthMiddleware = new AuthMiddleware(this.app);
-
+  private strictRequestMiddleware: StrictRequestMiddleware =
+    new StrictRequestMiddleware(this.app);
+  private requestLoggerMiddleware: RequestLoggerMiddleware =
+    new RequestLoggerMiddleware(this.app);
   private mainRouter: MainRouter = new MainRouter(this.app);
   private httpExceptionHandler: HttpExceptionHandlerService =
     new HttpExceptionHandlerService(this.app);
   private readonly redisDataSource: RedisDataSource =
     RedisDataSource.getInstance();
-
   private readonly croneJobsWrapper: CronJobsWrapperService =
     new CronJobsWrapperService([new TestJob().getCroneJob()]);
 
@@ -55,17 +59,35 @@ class Server {
         LoggerLevelEnum.INFO,
         new InfoLog("Application run details.", getAppDetails(__filename))
       );
+
       this.morgan.init([Routes.V1 + Routes.CHECK + Routes.PING]);
 
       this.app.use(express.json());
 
       this.app.use(express.urlencoded({extended: true}));
 
+      this.requestLoggerMiddleware.init({
+        excludedRoutes: [
+          Routes.V1 + Routes.CHECK + Routes.PING,
+          Routes.V1 + Routes.CHECK + Routes.TELEMETRY,
+        ],
+      });
+
       this.securityHelpers.setSecureHeaders();
       this.securityHelpers.initSecureHeadersMiddleware();
 
+      this.strictRequestMiddleware.init({
+        excludedRoutes: [
+          Routes.V1 + Routes.CHECK + Routes.PING,
+          Routes.V1 + Routes.CHECK + Routes.TELEMETRY,
+        ],
+      });
+
       this.authMiddleware.init({
-        excludedRoutes: [],
+        excludedRoutes: [
+          Routes.V1 + Routes.CHECK + Routes.PING,
+          Routes.V1 + Routes.CHECK + Routes.TELEMETRY,
+        ],
       });
 
       this.mainRouter.init([
