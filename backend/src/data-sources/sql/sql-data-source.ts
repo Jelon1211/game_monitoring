@@ -1,5 +1,4 @@
-import debSql from "debug";
-import mysql from "mysql2";
+import {Pool, PoolClient, QueryResultRow} from "pg";
 import {Config} from "../../config-builder/config.interface";
 import ConfigBuilder from "../../config-builder/config-builder";
 import {AppLogger} from "../../loggers/logger-service/logger.service";
@@ -9,163 +8,105 @@ import {ExceptionCodeEnum} from "../../exceptions/exception-code.enum";
 import {InfoLog} from "../../loggers/info-log/info-log.instance";
 import {ErrorLog} from "../../loggers/error-log/error-log.instance";
 import {CustomException} from "../../exceptions/custom-exception.interface";
+import debug from "debug";
 
-export class MySqlDataSource {
-  private static instance: MySqlDataSource | null = null;
+export class PostgresDataSource {
+  private static instance: PostgresDataSource | null = null;
   private readonly config: Config = ConfigBuilder.getConfig().config;
   private readonly logger: AppLogger = AppLogger.getInstance();
-  private mysqlPool: mysql.PoolCluster | null = null;
-  private readonly debug = debSql("MySql");
+  private readonly debug = debug("Postgres");
+  private readonly readPool: Pool;
+  private readonly writePool: Pool;
 
   private constructor() {
-    this.initialize();
-  }
-
-  public static getInstance(): MySqlDataSource {
-    if (!MySqlDataSource.instance) {
-      MySqlDataSource.instance = new MySqlDataSource();
-    }
-    return MySqlDataSource.instance;
-  }
-
-  private initialize(): void {
-    if (!this.config.mysqlRead || !this.config.mysqlWrite) {
+    if (!this.config.postgresRead || !this.config.postgresWrite) {
       const error = new SqlException(
-        "Missing MySQL configuration in the config file.",
+        "Missing PostgreSQL configuration in config file.",
         ExceptionCodeEnum.MYSQL_SERVICE__CONN_ERR
       );
       this.logger.log(LoggerLevelEnum.ERROR, error);
       throw error;
     }
 
-    this.mysqlPool = mysql.createPoolCluster();
-    this.mysqlPool.add(
-      this.config.mysqlRead.id,
-      this.config.mysqlRead.connection
-    );
-    this.mysqlPool.add(
-      this.config.mysqlWrite.id,
-      this.config.mysqlWrite.connection
-    );
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+    this.readPool = new Pool(this.config.postgresRead.connection);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+    this.writePool = new Pool(this.config.postgresWrite.connection);
 
-    this.addPoolListeners();
+    this.addPoolListeners(this.readPool, "read");
+    this.addPoolListeners(this.writePool, "write");
   }
 
-  private addPoolListeners(): void {
-    if (!this.mysqlPool) {
-      return;
+  public static getInstance(): PostgresDataSource {
+    if (!PostgresDataSource.instance) {
+      PostgresDataSource.instance = new PostgresDataSource();
     }
+    return PostgresDataSource.instance;
+  }
 
-    this.mysqlPool.on("enqueue", () => {
-      this.debug("Waiting for available connection slot.");
+  private addPoolListeners(pool: Pool, label: string): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    pool.on("connect", (_client: PoolClient) => {
+      this.debug(`New ${label} client connected.`);
     });
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.mysqlPool.on("acquire", (connection: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      this.debug(`Connection acquired. Thread Id: ${connection.threadId}`);
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.mysqlPool.on("release", (connection: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      this.debug(`Connection released. Thread Id: ${connection.threadId}`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    pool.on("error", (err) => {
+      return this.logger.log(
+        LoggerLevelEnum.ERROR,
+        new ErrorLog(err as CustomException)
+      );
     });
   }
 
-  public executeQuery<T>(
+  public async executeQuery<T extends QueryResultRow>(
     query: string,
     params: unknown[] = [],
-    isWrite: boolean = false
+    isWrite = false
   ): Promise<T> {
-    if (!this.mysqlPool) {
-      throw new SqlException(
-        "MySQL pool has not been initialized.",
-        ExceptionCodeEnum.MYSQL_SERVICE__CONN_ERR
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const pool = isWrite ? this.writePool : this.readPool;
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      const client = await pool.connect();
+      try {
+        this.debug(
+          `Executing query: ${query} with params: ${JSON.stringify(params)}`
+        );
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        const res = await client.query<T>(query, params);
+        this.logger.log(
+          LoggerLevelEnum.DEBUG,
+          new InfoLog("Postgres query executed", {query})
+        );
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+        return res.rows as unknown as T;
+      } finally {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        client.release();
+      }
+    } catch (error) {
+      this.logger.log(
+        LoggerLevelEnum.ERROR,
+        new ErrorLog(error as CustomException)
       );
+      throw error;
     }
-
-    const poolType = isWrite
-      ? this.config.mysqlWrite.id
-      : this.config.mysqlRead.id;
-
-    return new Promise<T>((resolve, reject) => {
-      this.mysqlPool!.getConnection(poolType, (error, connection) => {
-        if (error) {
-          this.logger.log(
-            LoggerLevelEnum.ERROR,
-            new ErrorLog(error as CustomException)
-          );
-          connection?.release();
-          return reject(error);
-        }
-
-        const formattedQuery = mysql.format(query, params);
-        this.debug(`Executing query: ${formattedQuery}`);
-
-        connection.query(formattedQuery, (queryError, results: unknown) => {
-          this.logger.log(
-            LoggerLevelEnum.DEBUG,
-            new InfoLog("Sql procedure called,", {query})
-          );
-          this.debug(query);
-          connection.release();
-
-          if (queryError) {
-            return reject(queryError);
-          }
-
-          resolve(results as T);
-        });
-      });
-    });
   }
 
   public async testConnections(): Promise<void> {
-    if (!this.mysqlPool) {
-      throw new SqlException(
-        "MySQL pool has not been initialized.",
-        ExceptionCodeEnum.MYSQL_SERVICE__CONN_ERR
-      );
-    }
-
     try {
-      const testReadConnection = new Promise((resolve, reject) => {
-        this.mysqlPool!.getConnection(
-          this.config.mysqlRead.id,
-          (error, connection) => {
-            if (error) {
-              connection?.release();
-              return reject(error);
-            }
-            connection?.release();
-            resolve(true);
-          }
-        );
-      });
-
-      const testWriteConnection = new Promise((resolve, reject) => {
-        this.mysqlPool!.getConnection(
-          this.config.mysqlWrite.id,
-          (error, connection) => {
-            if (error) {
-              connection?.release();
-              return reject(error);
-            }
-            connection?.release();
-            resolve(true);
-          }
-        );
-      });
-
-      await Promise.all([testReadConnection, testWriteConnection]);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      await this.readPool.query("SELECT 1");
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      await this.writePool.query("SELECT 1");
       this.logger.log(
         LoggerLevelEnum.INFO,
-        new InfoLog("All MySQL pools tested successfully.")
+        new InfoLog("All Postgres pools tested successfully.")
       );
     } catch (err) {
       const error = new SqlException(
-        "Error while testing connection for each pool configured.",
+        "Error while testing Postgres connections.",
         ExceptionCodeEnum.MYSQL_SERVICE__CONN_ERR,
         {cause: err}
       );

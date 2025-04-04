@@ -1,18 +1,27 @@
-// import {MySqlDataSource} from "./sql-data-source";
-// import {AppLogger} from "../../loggers/logger-service/logger.service";
+import {PostgresDataSource} from "./sql-data-source";
 
 export class SqlDataAccessFacade {
   private static instance: SqlDataAccessFacade | null = null;
-  // private readonly logger: AppLogger = AppLogger.getInstance();
-  // private readonly mySqlDataSource: MySqlDataSource =
-  //   MySqlDataSource.getInstance();
+  private readonly postgresDataSource = PostgresDataSource.getInstance();
 
   private constructor() {}
 
-  public static getInstance() {
-    if (SqlDataAccessFacade.instance) {
-      return SqlDataAccessFacade.instance;
+  public static getInstance(): SqlDataAccessFacade {
+    if (!SqlDataAccessFacade.instance) {
+      SqlDataAccessFacade.instance = new SqlDataAccessFacade();
     }
-    return (SqlDataAccessFacade.instance = new SqlDataAccessFacade());
+    return SqlDataAccessFacade.instance;
+  }
+
+  public executeQuery<T>(
+    query: string,
+    params: unknown[] = [],
+    isWrite = false
+  ): Promise<T> {
+    return this.postgresDataSource.executeQuery<T>(query, params, isWrite);
+  }
+
+  public testConnections(): Promise<void> {
+    return this.postgresDataSource.testConnections();
   }
 }

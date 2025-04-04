@@ -1,9 +1,8 @@
 export enum Status {
-	OK = 'OK',
-	ERROR = 'ERROR'
+  OK = "OK",
+  ERROR = "ERROR",
 }
 
 export interface Telemetry {
-	// rabbit: Status,
-	mysql: Status,
+  postgres: Status;
 }

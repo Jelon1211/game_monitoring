@@ -45,31 +45,25 @@ config.sentry = {
   release: process.env.APP_VERSION_NUMBER,
 };
 
-config.mysqlRead = {
-  id: "READ",
+config.postgresRead = {
+  id: "read",
   connection: {
-    connectionLimit: 10,
     host: "",
-    timezone: "Z",
     port: null,
     database: "",
     user: "",
     password: "",
-    charset: "UTF8_GENERAL_CI",
   },
 };
 
-config.mysqlWrite = {
-  id: "WRITE",
+config.postgresWrite = {
+  id: "write",
   connection: {
-    connectionLimit: 10,
     host: "",
-    timezone: "Z",
     port: null,
     database: "",
     user: "",
     password: "",
-    charset: "UTF8_GENERAL_CI",
   },
 };
 

@@ -19,12 +19,12 @@ import {AuthMiddleware} from "./api-server/auth/auth.middleware";
 import {HttpExceptionHandlerService} from "./api-server/exception-handling/http-exception-handler/http.exception-handler.service";
 import {CronJobsWrapperService} from "./cron/cron-jobs-wrapper.service";
 import {AppSentry} from "./loggers/sentry/sentry";
-// import {MySqlDataSource} from "./data-sources/sql/sql-data-source";
 import {RobloxTrackerRouter} from "./api-server/roblox-tracker/router/roblox-tracker.router";
 import {TestJob} from "./cron/crone-jobs/test.job";
 import {RedisDataSource} from "./data-sources/redis/redis-data-source";
 import {StrictRequestMiddleware} from "./api-server/auth/strict.request.middleware";
 import {RequestLoggerMiddleware} from "./api-server/logging/request-logger.middleware";
+import {PostgresDataSource} from "./data-sources/sql/sql-data-source";
 
 assignProcessEnvs(__dirname);
 
@@ -50,6 +50,8 @@ class Server {
     new HttpExceptionHandlerService(this.app);
   private readonly redisDataSource: RedisDataSource =
     RedisDataSource.getInstance();
+  private readonly postgressDataSource: PostgresDataSource =
+    PostgresDataSource.getInstance();
   private readonly croneJobsWrapper: CronJobsWrapperService =
     new CronJobsWrapperService([new TestJob().getCroneJob()]);
 
@@ -99,6 +101,7 @@ class Server {
       this.httpExceptionHandler.init();
 
       await this.redisDataSource.testConnections();
+      await this.postgressDataSource.testConnections();
 
       this.croneJobsWrapper.startAll();
 

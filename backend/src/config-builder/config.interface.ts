@@ -1,4 +1,4 @@
-import {Secret} from "jsonwebtoken";
+import {PoolConfig} from "pg";
 
 interface ExpressApi {
   bind: string;
@@ -57,27 +57,9 @@ export enum ConnectionTypeId {
   WRITE = "WRITE",
 }
 
-// export
-export interface MySqlConnection {
-  connectionLimit: number;
-  host: string;
-  port: number;
-  database: string;
-  user: string;
-  password: string;
-  charset: string;
-  timezone?: string;
-}
-
 export interface ConfiguredPool {
   id: ConnectionTypeId;
-  connection: MySqlConnection;
-}
-
-interface Tls {
-  ciphers: string;
-  honorCipherOrder: boolean;
-  secureProtocol: string;
+  connection: PoolConfig;
 }
 
 interface Notify {
@@ -102,13 +84,11 @@ export interface Config {
   luxon: Luxon;
   winston: Winston;
   sentry: ConfigSentry;
-  mysqlRead: ConfiguredPool;
-  mysqlWrite: ConfiguredPool;
-  tls: Tls;
+  postgresRead: ConfiguredPool;
+  postgresWrite: ConfiguredPool;
   notificationConsumer: Notify;
   cron: Cron;
   timeInterval: TimeInterval;
-  jwt: Jwt;
   redis: RedisConnection;
   secret: Secret;
   allowedOrigins: string[];
@@ -123,10 +103,6 @@ interface RedisConnection {
     host: string;
     port: number;
   };
-}
-
-interface Jwt {
-  secret: string;
 }
 
 export interface Merchant {

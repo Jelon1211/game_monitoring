@@ -12,10 +12,14 @@ export class StrictRequestMiddleware {
     "accept",
     "user-agent",
     "cache-control",
-    "x-platform-token",
     "postman-token",
     "host",
     "connection",
+    "traceparent",
+    "roblox-id",
+    "accept-encoding",
+    "content-length",
+    "x-platform-token",
   ]);
 
   constructor(private readonly app: Express) {}
