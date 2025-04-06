@@ -1,3 +1,4 @@
+import {User} from "../../../config-builder/config.interface";
 import {RedisDataAccessFacade} from "../../../data-sources/redis/redis-data-access-facade";
 import {ExceptionCodeEnum} from "../../../exceptions/exception-code.enum";
 import {TrackerException} from "../../../exceptions/tracker.exception";
@@ -27,10 +28,15 @@ export class RobloxTrackerService {
   private readonly logger: AppLogger = AppLogger.getInstance();
   private readonly redisFacade: RedisDataAccessFacade =
     RedisDataAccessFacade.getInstance();
+  private user: User | null = null;
 
-  public async cacheRobloxServerData(data: RobloxEventDTO): Promise<void> {
+  public async cacheRobloxServerData(
+    data: RobloxEventDTO,
+    serverUser: User
+  ): Promise<void> {
     try {
-      const key = `server_id:${data.server_id}`;
+      this.user = serverUser;
+      const key = `server_id:${this.user.sub}`;
       await this.redisFacade.trimList(key, 1000);
       await this.redisFacade.setExpiration(key, 86400);
       await this.cacheEvent(data);
@@ -41,7 +47,15 @@ export class RobloxTrackerService {
 
   private async cacheEvent(data: RobloxEventDTO): Promise<void> {
     try {
-      const key = `server_id:${data.server_id}`;
+      if (!this.user) {
+        const error = new TrackerException(
+          `Error executing cacheEvent function`,
+          ExceptionCodeEnum.TRACKER__ERR,
+          {cause: "User not defined"}
+        );
+        this.logger.log(LoggerLevelEnum.ERROR, new ErrorLog(error));
+      }
+      const key = `server_id:${this.user!.sub}`;
       const value = JSON.stringify({[data.event_type]: data.data});
 
       await this.redisFacade.pushToList(key, value);

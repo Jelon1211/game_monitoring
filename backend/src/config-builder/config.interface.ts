@@ -105,7 +105,7 @@ interface RedisConnection {
   };
 }
 
-export interface Merchant {
+export interface User {
   sub: string;
   role: string;
   platform: string;

@@ -111,7 +111,10 @@ export class RobloxTrackerRouter {
             }
 
             res.status(200).end();
-            await this.robloxTrackerService.cacheRobloxServerData(data);
+            await this.robloxTrackerService.cacheRobloxServerData(
+              data,
+              req.user
+            );
           } catch (err) {
             const error = new HttpException("Internal server error", 500, {
               cause: err,

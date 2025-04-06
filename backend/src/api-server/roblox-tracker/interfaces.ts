@@ -23,11 +23,9 @@ export type ServerStatusDTO = RobloxDTO<ServerStatus[]>;
 
 interface ActiveUsers {
   name: string;
-  session_duration: number;
   userid: number;
-  join_time: number;
   position?: PlayerPosition;
-  device_type: DeviceTypeEnum;
+  timestamp: number;
 }
 interface PlayerPosition {
   x: number;

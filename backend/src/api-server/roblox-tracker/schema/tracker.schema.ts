@@ -25,19 +25,6 @@ const positionProperties = {
   nullable: true,
 };
 
-const activeUserProperties = {
-  ...userProperties,
-  session_duration: {type: "number", minimum: 0},
-  join_time: {type: "number"},
-  position: positionProperties,
-  device_type: {type: "string", enum: ["Mobile", "PC", "Console"]},
-};
-
-const playerJoinProperties = {
-  ...userProperties,
-  join_time: {type: "number", minimum: 1},
-};
-
 const playerLeaveProperties = {
   ...userProperties,
   session_duration: {type: "number", minimum: 1},
@@ -104,15 +91,15 @@ export const activeUsersSchema = {
       type: "array",
       items: {
         type: "object",
-        properties: activeUserProperties,
+        properties: {
+          ...userProperties,
+          // session_duration: {type: "number", minimum: 0},
+          // join_time: {type: "number"},
+          position: positionProperties,
+          timestamp: {type: "number"},
+        },
         additionalProperties: false,
-        required: [
-          "name",
-          "session_duration",
-          "userid",
-          "join_time",
-          "device_type",
-        ],
+        required: ["name", "userid"],
       },
     },
   },
@@ -127,7 +114,14 @@ export const playerJoinSchema = {
       type: "array",
       items: {
         type: "object",
-        properties: playerJoinProperties,
+        properties: {
+          ...userProperties,
+          join_time: {type: "number", minimum: 1},
+          device_type: {
+            type: "string",
+            enum: ["Mobile", "PC", "Console", "Unknown"],
+          },
+        },
         additionalProperties: false,
         required: ["userid", "name", "join_time"],
       },

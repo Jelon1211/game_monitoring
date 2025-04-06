@@ -25,6 +25,7 @@ import {RedisDataSource} from "./data-sources/redis/redis-data-source";
 import {StrictRequestMiddleware} from "./api-server/auth/strict.request.middleware";
 import {RequestLoggerMiddleware} from "./api-server/logging/request-logger.middleware";
 import {PostgresDataSource} from "./data-sources/sql/sql-data-source";
+import {PlatformTokenMiddleware} from "./api-server/auth/platform.token.middleware";
 
 assignProcessEnvs(__dirname);
 
@@ -41,6 +42,8 @@ class Server {
     this.app
   );
   private authMiddleware: AuthMiddleware = new AuthMiddleware(this.app);
+  private platformTokenMiddleware: PlatformTokenMiddleware =
+    new PlatformTokenMiddleware(this.app);
   private strictRequestMiddleware: StrictRequestMiddleware =
     new StrictRequestMiddleware(this.app);
   private requestLoggerMiddleware: RequestLoggerMiddleware =
@@ -86,6 +89,13 @@ class Server {
       });
 
       this.authMiddleware.init({
+        excludedRoutes: [
+          Routes.V1 + Routes.CHECK + Routes.PING,
+          Routes.V1 + Routes.CHECK + Routes.TELEMETRY,
+        ],
+      });
+
+      this.platformTokenMiddleware.init({
         excludedRoutes: [
           Routes.V1 + Routes.CHECK + Routes.PING,
           Routes.V1 + Routes.CHECK + Routes.TELEMETRY,
