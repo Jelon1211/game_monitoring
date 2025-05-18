@@ -17,7 +17,6 @@ services:
       - POSTGRES_DB=yourdatabase
     volumes:
       - ./backend:/app
-      - /app/node_modules
     command: npm run dev
     restart: unless-stopped
     depends_on:
@@ -35,7 +34,6 @@ services:
       - NODE_ENV=development
     volumes:
       - ./frontend:/app
-      - /app/node_modules
     command: npm run dev
     depends_on:
       - backend
