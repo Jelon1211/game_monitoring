@@ -1,0 +1,22 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE IF NOT EXISTS "user" (
+  id SERIAL PRIMARY KEY,
+  uuid UUID NOT NULL DEFAULT uuid_generate_v4(),
+  workos_user_id TEXT NOT NULL UNIQUE,
+  account_type TEXT NOT NULL,
+  created INT DEFAULT (EXTRACT(EPOCH FROM now())),
+  modified INT DEFAULT (EXTRACT(EPOCH FROM now()))
+);
+
+CREATE TABLE IF NOT EXISTS user_jwt (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+  token TEXT NOT NULL,
+  name TEXT NOT NULL,
+  platform TEXT NOT NULL,
+  description TEXT,
+  expire_at TIMESTAMP NOT NULL,
+  created INT DEFAULT (EXTRACT(EPOCH FROM now())),
+  modified INT DEFAULT (EXTRACT(EPOCH FROM now()))
+);

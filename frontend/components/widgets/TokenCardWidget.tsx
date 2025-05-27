@@ -22,25 +22,48 @@ export default function TokenCardWidget({ token }: { token: JwtToken }) {
         Your token details
       </h2>
 
-      <div className="relative flex gap-12 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-lg border border-gray-200">
-        <div className="flex flex-col space-y-2 text-gray-500 dark:text-gray-400 leading-loose">
-          <span>Name</span>
+      <div className="relative flex flex-col bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-lg border border-gray-200">
+        <div className="flex leading-loose justify-between">
+          <span className="text-gray-500 dark:text-gray-400">Platform:</span>
+          <span className="text-gray-900 dark:text-white">
+            {token.platform}
+          </span>
+        </div>
+        <div className="flex leading-loose justify-between">
+          <span className="text-gray-500 dark:text-gray-400">Name:</span>
+          <span className="text-gray-900 dark:text-white">{token.name}</span>
+        </div>
+        <div className="flex leading-loose justify-between">
+          <span className="text-gray-500 dark:text-gray-400">Description:</span>
+          <span className="text-gray-900 dark:text-white text-right">
+            {token.description}
+          </span>
+        </div>
+        <div className="flex leading-loose justify-between">
+          <span className="text-gray-500 dark:text-gray-400">Expiry:</span>
+          <LocaleDate date={token.expire_at} />
+        </div>
+        <div className="flex leading-loose justify-between">
+          <span className="text-gray-500 dark:text-gray-400">Token:</span>
+          <span className="text-gray-900 dark:text-white max-w-xs truncate">
+            {token.token}
+          </span>
+        </div>
+        {/* <span>Name</span>
           <span>Platform</span>
           <span>Description</span>
           <span>Expiry date</span>
           <span>Token</span>
         </div>
         <div className="flex flex-col space-y-2 text-gray-900 dark:text-white font-medium leading-loose w-[50%]">
-          <span>{token.name}</span>
+          <span></span>
           <span>{token.platform}</span>
           <span>{token.description}</span>
           <LocaleDate date={token.expire_at} />
-          <span className=" max-w-xs truncate">{token.token}</span>
-        </div>
-
+          <span className=" max-w-xs truncate">{token.token}</span> */}
         <button
           onClick={handleCopy}
-          className="absolute end-2 bottom-5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg p-2 inline-flex items-center justify-center group"
+          className="absolute -end-1 bottom-5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg p-2 inline-flex items-center justify-center group"
         >
           {copied ? <SuccessIcon /> : <ClipboardIcon />}
           <span

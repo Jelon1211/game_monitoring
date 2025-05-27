@@ -44,7 +44,8 @@ export default function GenerateTokenModal() {
       user_id: user!.id,
       role: "free",
     };
-    return await generateJWT(jwtPayload);
+    await generateJWT(jwtPayload);
+    return setIsOpen(false);
   };
 
   return (
