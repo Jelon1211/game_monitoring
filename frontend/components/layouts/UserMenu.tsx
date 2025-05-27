@@ -10,7 +10,7 @@ export default function UserMenu() {
   return (
     <div className="relative">
       <UserAvatarButton onClick={() => setOpen(!open)} buttonRef={buttonRef} />
-      {open && <UserDropdown dropdownRef={dropdownRef} />}
+      {open && <UserDropdown dropdownRef={dropdownRef} setOpen={setOpen} />}
     </div>
   );
 }

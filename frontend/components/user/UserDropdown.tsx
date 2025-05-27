@@ -8,8 +8,10 @@ import { RouteGroup } from "@/enums/routes";
 
 export default function UserDropdown({
   dropdownRef,
+  setOpen,
 }: {
   dropdownRef: RefObject<HTMLDivElement | null>;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { user } = useUser();
 
@@ -36,6 +38,7 @@ export default function UserDropdown({
             <Link
               href={route.href}
               className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+              onClick={() => setOpen(false)}
             >
               {route.label}
             </Link>
